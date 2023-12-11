@@ -7,9 +7,9 @@
 }
 
 :root {
-  --color-fg: #b9c6df;
-  --color-bg: #1a1f33;
-  --color-bg-dark: #080c1b;
+  --color-fg: #ffffff;
+  --color-bg: rgba(60, 60, 60, 1);
+  --color-bg-dark: #1e1e1e;
   --color-border: #2d3861;
   --color-5-star-start: #83471b;
   --color-5-star-end: #ab5c10;
@@ -157,4 +157,120 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.game-board {
+  position: sticky;
+  top: 1em;
+  width: calc(var(--board-cols) * 10vw);
+  height: calc(var(--board-rows) * 10vw);
+  min-width: 300px;
+  min-height: 300px;
+  max-width: calc(100vh - 2em);
+  max-height: calc(100vh - 2em);
+  overflow: hidden;
+  border: 12px solid #73752d;
+  border-radius: 12px;
+  display: block;
+}
+
+:root {
+  --board-cols: 8;
+  --board-rows: 8;
+  --player-row: 1;
+  --player-col: 1;
+}
+
+#map {
+  display: grid;
+  grid-template-columns: repeat(var(--board-cols), 1fr);
+  grid-template-rows: repeat(var(--board-rows), 1fr);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(src/components/App/background.png);
+  background-size: calc(70vw);
+}
+
+#players {
+  display: grid;
+  grid-template-columns: repeat(var(--board-cols), 1fr);
+  grid-template-rows: repeat(var(--board-rows), 1fr);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wall {
+  background-color: black;
+}
+
+
+
+.tile {
+  background-size: calc(10vw - 4px);
+  width: 100%;
+  height: 100%;
+}
+
+.tile1 {
+  background-image: url(src/components/App/tile1.png);
+}
+
+.tile2 {
+  background-image: url(src/components/App/tile2.png);
+}
+
+.tile3 {
+  background-image: url(src/components/App/tile3.png);
+}
+
+.tile4 {
+  background-image: url(src/components/App/tile4.png);
+}
+
+.tile5 {
+  background-image: url(src/components/App/tile5.png);
+}
+
+.tile6 {
+  background-image: url(src/components/App/tile6.png);
+}
+
+.tile7 {
+}
+
+.tile8 {
+}
+
+.player {
+  grid-column-start: var(--player-col);
+  grid-row-start: var(--player-row); 
+  transition: all 2s ease;
+}
+
+.body {
+  background-image: url(src/components/App/char1.png);
+  background-size: calc(12vw);
+  background-position: -8px -5px;
+}
+
+#connection {
+  min-height: 100vh;
+    padding: 1em;
+    position: relative;
+    min-height: 0;
+    display: block;
+}
+
+#play {
+  min-height: 100vh;
+    padding: 1em;
+    position: relative;
+    min-height: 0;
+    display: block;
 }
