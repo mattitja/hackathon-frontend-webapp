@@ -30,9 +30,18 @@ const App: Component = () => {
   const boardHeight = 8;
   const totalTiles = new Array(boardHeight * boardWidth).fill(0);
 
-  const player = document.querySelector('#root') as HTMLElement;
-  player.style.setProperty('--player-row', rand(1,8).toString());
-  player.style.setProperty('--player-col', rand(1,8).toString());
+  const [playerPosition, setPlayerPosition] = createSignal({
+    row: rand(1, 8),
+    col: rand(1, 8),
+  });
+
+  const movePlayer = (row, col) => {
+    const x = Math.abs(playerPosition().col - col);
+    const y = Math.abs(playerPosition().row - row);
+    if ((x == 0 && y == 1) || (x == 1 && y == 0)) {
+      setPlayerPosition({ row, col });
+    }
+  };
 
   // irgendwie ist die normale random funktion nicht random genug
   function rand(a, b) {
@@ -44,14 +53,6 @@ const App: Component = () => {
     );
   }
 
-  function movePlayer(newCol: number, newRow: number): void {
-    const player = document.querySelector('#root') as HTMLElement;
-    player.style.setProperty('--player-col', newCol.toString());
-    player.style.setProperty('--player-row', newRow.toString());
-  }
-
-  
-
   return (
     <div>
       <section id="connection">
@@ -62,12 +63,6 @@ const App: Component = () => {
               <li>{msg}</li>
             ))}
           </ul>
-          <button id="moveButton" onClick={ e => {
-            player.style.setProperty('--player-row', rand(1,8).toString());
-            player.style.setProperty('--player-col', rand(1,8).toString());
-          }
-            
-          }>Move Player</button>
         </div>
       </section>
       <section id="play">
@@ -79,14 +74,33 @@ const App: Component = () => {
             })}
           </div>
           <div id="players">
-            <div class="player body"></div>
+            <div
+              class="player body"
+              style={{
+                '--player-row': playerPosition().row,
+                '--player-col': playerPosition().col,
+              }}
+            ></div>
+          </div>
+          <div id="actions">
+            {totalTiles.map((_, index) => {
+              const row = Math.floor(index / boardWidth) + 1;
+              const col = (index % boardWidth) + 1;
+              return (
+                <div
+                  class="action"
+                  onclick={() => {
+                    movePlayer(row, col);
+                  }}
+                  data-action-id={`${row}-${col}`}
+                ></div>
+              );
+            })}
           </div>
         </div>
       </section>
     </div>
   );
 };
-
-
 
 export { App };
