@@ -26,13 +26,18 @@ const App: Component = () => {
       ws.removeEventListener('message', onMessage);
     });
   });
-  const boardWidth = 8;
-  const boardHeight = 8;
+  const boardWidth = 5;
+  const boardHeight = 5;
   const totalTiles = new Array(boardHeight * boardWidth).fill(0);
 
   const [playerPosition, setPlayerPosition] = createSignal({
-    row: rand(1, 8),
-    col: rand(1, 8),
+    row: rand(1, boardWidth),
+    col: rand(1, boardHeight),
+  });
+
+  const [boardProperties, setBoardProperties] = createSignal({
+    rows: boardHeight,
+    cols: boardWidth,
   });
 
   const movePlayer = (row, col) => {
@@ -66,7 +71,13 @@ const App: Component = () => {
         </div>
       </section>
       <section id="play">
-        <div class="game-board">
+        <div
+          class="game-board"
+          style={{
+            '--board-rows': boardProperties().rows,
+            '--board-cols': boardProperties().cols,
+          }}
+        >
           <div id="map">
             {totalTiles.map(() => {
               const tileClassNumber = 'tile tile' + Math.floor(rand(1, 8));
@@ -79,6 +90,40 @@ const App: Component = () => {
               style={{
                 '--player-row': playerPosition().row,
                 '--player-col': playerPosition().col,
+              }}
+            ></div>
+          </div>
+          <div id="overlays">
+            <div
+              id="overlay-left"
+              class="overlay"
+              style={{
+                'grid-column-start': playerPosition().col - 1,
+                'grid-row-start': playerPosition().row,
+              }}
+            ></div>
+            <div
+              id="overlay-right"
+              class="overlay"
+              style={{
+                'grid-column-start': playerPosition().col + 1,
+                'grid-row-start': playerPosition().row,
+              }}
+            ></div>
+            <div
+              id="overlay-top"
+              class="overlay"
+              style={{
+                'grid-column-start': playerPosition().col,
+                'grid-row-start': playerPosition().row - 1,
+              }}
+            ></div>
+            <div
+              id="overlay-bottom"
+              class="overlay"
+              style={{
+                'grid-column-start': playerPosition().col,
+                'grid-row-start': playerPosition().row + 1,
               }}
             ></div>
           </div>
