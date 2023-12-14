@@ -1,0 +1,305 @@
+openapi: 3.0.1
+info:
+  title: Agile Wars
+  version: "0.0.2"
+servers:
+  - url: localhost:8080/
+
+paths:
+  /myself:
+    get:
+      operationId: getMyself
+      tags:
+        - Myself
+      responses:
+        "200":
+          description: OK
+
+components:
+  schemas:
+
+
+    CoordinateDto:
+      type: object
+      required:
+        - posX
+        - posY
+      properties:
+        posX:
+          type: integer
+          example: 3
+        posY:
+          type: integer
+          example: 6
+
+    PlayerDto:
+      type: object
+      required:
+        - playerId
+        - nickname
+      properties:
+        playerId:
+          type: string
+          example: player1_id
+        nickname:
+          type: string
+          example: Bob
+
+    WeaponDto:
+      type: string
+      enum:
+        - SCHERE
+        - STEIN
+        - PAPIER
+
+    ActionDto:
+      type: object
+      required:
+        - actionType
+        - playerId
+        - gameId
+      properties:
+        actionType:
+          type: string
+        playerId:
+          type: string
+        gameId:
+          type: string
+          nullable: true
+      discriminator:
+        propertyName: actionType
+        mapping:
+          MovementAction: '#/components/schemas/MovementActionDto'
+          InventoryUpdateAction: '#/components/schemas/InventoryUpdateActionDto'
+          FinishTurnAction: '#/components/schemas/FinishTurnActionDto'
+          JoinAction: '#/components/schemas/JoinActionDto'
+          GameCreateAction: '#/components/schemas/GameCreateActionDto'
+          StartGameAction: '#/components/schemas/StartGameActionDto'
+
+    MovementActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+        - type: object
+          required:
+            - to
+          properties:
+            from:
+              $ref: '#/components/schemas/CoordinateDto'
+            to:
+              $ref: '#/components/schemas/CoordinateDto'
+
+    InventoryUpdateActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+        - type: object
+          properties:
+            weapons:
+              type: array
+              items:
+                $ref: '#/components/schemas/WeaponDto'
+
+    FinishTurnActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+
+    JoinActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+        - type: object
+          required:
+            - nickname
+          properties:
+            nickname:
+              type: string
+
+    GameCreateActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+
+    StartGameActionDto:
+      allOf:
+        - $ref: '#/components/schemas/ActionDto'
+
+
+
+
+    EventDto:
+      type: object
+      required:
+        - eventType
+        - eventId
+        - gameId
+      properties:
+        eventType:
+          type: string
+        eventId:
+          type: integer
+        gameId:
+          type: string
+      discriminator:
+        propertyName: eventType
+        mapping:
+          MovementEvent: '#/components/schemas/MovementEventDto'
+          ErrorEvent: '#/components/schemas/ErrorEventDto'
+          JoinEvent: '#/components/schemas/JoinEventDto'
+          FightEvent: '#/components/schemas/FightEventDto'
+          InventoryUpdateEvent: '#/components/schemas/InventoryUpdateEventDto'
+          KillEvent: '#/components/schemas/KillEventDto'
+          HealthUpdateEvent: '#/components/schemas/HealthUpdateEventDto'
+          GameEndEvent: '#/components/schemas/GameEndEventDto'
+          GameStartEvent: '#/components/schemas/GameStartEventDto'
+          GameCreatedEvent: '#/components/schemas/GameStartEventDto'
+          NextTurnEvent: '#/components/schemas/NextTurnEventDto'
+
+    MovementEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - to
+            - playerId
+          properties:
+            from:
+              $ref: '#/components/schemas/CoordinateDto'
+            to:
+              $ref: '#/components/schemas/CoordinateDto'
+            playerId:
+              type: string
+
+    ErrorEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          properties:
+            message:
+              type: string
+
+
+    JoinEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - playerNicknames
+          properties:
+            playerNicknames:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlayerDto'
+
+    FightEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - playerId1
+            - playerWeapon1
+            - playerId2
+            - playerWeapon2
+            - position
+          properties:
+            playerId1:
+              type: string
+            playerWeapon1:
+              $ref: '#/components/schemas/WeaponDto'
+            playerId2:
+              type: string
+            playerWeapon2:
+              $ref: '#/components/schemas/WeaponDto'
+            position:
+              $ref: '#/components/schemas/CoordinateDto'
+            winnerId:
+              type: string
+
+
+    InventoryUpdateEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - playerId
+            - weapons
+          properties:
+            playerId:
+              type: string
+            weapons:
+              type: array
+              items:
+                $ref: '#/components/schemas/WeaponDto'
+
+    KillEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - playerId
+          properties:
+            playerId:
+              type: string
+
+    HealthUpdateEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - playerId
+            - newHealth
+          properties:
+            playerId:
+              type: string
+            newHealth:
+              type: integer
+
+    GameEndEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          properties:
+            winnerId:
+              type: string
+            reason:
+              type: string
+              enum:
+                - WINNER
+                - DRAW
+                - PLAYER_LEFT_DURING_GAME_CREATION
+
+    GameStartEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+
+
+    GameCreatedEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - players
+            - boardProperties
+          properties:
+            players:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlayerDto'
+            boardProperties:
+              type: object
+              required:
+                - width
+                - height
+              properties:
+                width:
+                  type: integer
+                  example: 5
+                height:
+                  type: integer
+                  example: 8
+    NextTurnEventDto:
+      allOf:
+        - $ref: '#/components/schemas/EventDto'
+        - type: object
+          required:
+            - nextPlayerId
+          properties:
+            nextPlayerId:
+              type: string
+
