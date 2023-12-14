@@ -99,7 +99,6 @@ html {
     var(--color-bg)
   );
   color: var(--color-fg);
-  padding: 20px;
   font-size: var(--size-font);
   font-family:
   'Videotype Regular',
@@ -239,71 +238,8 @@ button {
   z-index: 0;
 }
 
-.tile1 {
-  background-image: url(src/components/App/tile1.png);
-}
-
-.tile2 {
-  background-image: url(src/components/App/tile2.png);
-}
-
-.tile3 {
-  background-image: url(src/components/App/tile3.png);
-}
-
-.tile4 {
-  background-image: url(src/components/App/tile4.png);
-}
-
-.tile5 {
-  background-image: url(src/components/App/tile5.png);
-}
-
-.tile6 {
-  background-image: url(src/components/App/tile6.png);
-}
-
-.tile7 {
-}
-
-.tile8 {
-}
-
-.player {
-  z-index: 2;
-  grid-column-start: var(--player-col);
-  grid-row-start: var(--player-row);
-  position: relative;
-}
-
-.player-label {
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 5px;
-  white-space: nowrap;
-  z-index: 100;
-  font-size: 10px;
-}
-
-.overlay {
-  z-index: 3;
-  background-image: url(src/components/App/sign.png);
-  opacity: 80%;
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: opacity 0.5s ease;
-}
-
 .action {
   z-index: 10;
-}
-
-.body {
-  background-image: url(src/components/App/char1.png);
-  background-size: calc(12vw);
-  background-position: -8px -5px;
 }
 
 .log-details {

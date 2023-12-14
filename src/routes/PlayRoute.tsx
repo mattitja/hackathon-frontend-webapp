@@ -1,104 +1,122 @@
+import { createEffect } from "solid-js";
 import { useGame } from "../contexts/game";
+import {
+  CoordinateDto,
+  FinishTurnActionDto,
+  MovementActionDto,
+} from "../generated/whackend";
+import styles from "./PlayRoute.module.css";
 
 export const PlayRoute = () => {
+  const {
+    playerId,
+    gameId,
+    players,
+    ws,
+    playersTurn,
+    boardProperties,
+    playerPositions,
+  } = useGame();
 
-  const { name, players, playerId, ws, playersTurn, setName, setGameId, boardProperties, playerPositions } = useGame();
-  
-  const totalTiles = new Array(boardProperties().rows * boardProperties().cols).fill(0);
-    
+  const totalTiles = new Array(
+    boardProperties().rows * boardProperties().cols
+  ).fill(0);
+
   function isMyTurn() {
-    const myTurn = playerId === playersTurn();
-    if (myTurn) {
-      console.log(
-        "its my turn! playerId: " + playerId + " playersTurn: " + playersTurn()
-      );
-    }
-
-    return myTurn;
+    return playerId() === playersTurn();
   }
 
+  const handleMovePlayer = (x, y) => {
+    const action: MovementActionDto = {
+      actionType: "MovementAction",
+      playerId: playerId(),
+      gameId: gameId(),
+      from: playerPositions().get(playerId()),
+      to: { posX: x, posY: y },
+    };
+    ws.send(JSON.stringify(action));
+  };
+
+  const handleFinishTurn = () => {
+    const action: FinishTurnActionDto = {
+      actionType: "FinishTurnAction",
+      playerId: playerId(),
+      gameId: gameId(),
+    };
+    ws.send(JSON.stringify(action));
+  };
+
+  const overlays = [
+    { x: 1, y: 0 },
+    { x: -1, y: 0 },
+    { x: 0, y: 1 },
+    { x: 0, y: -1 },
+  ];
+
   return (
-    <section id="play">
-        <div
-          class="game-board"
+    <section class={styles.container}>
+      <div
+        class={styles.board}
+        style={{
+          "--board-rows": boardProperties().rows,
+          "--board-cols": boardProperties().cols,
+        }}
+      >
+        {totalTiles.map((_, idx) => {
+          const num = Math.floor(Math.random() * 7 + 1);
+
+          if (num >= 1 && num <= 6) {
+            return (
+              <div
+                class={styles.tile}
+                style={{
+                  "--tile-url": `url(src/components/App/tile${num}.png)`,
+                }}
+              ></div>
+            );
+          } else {
+            return <div />;
+          }
+        })}
+        {/* <div
+          class={styles.overlay}
           style={{
-            '--board-rows': boardProperties().rows,
-            '--board-cols': boardProperties().cols,
+            "grid-column-start": 2,
+            "grid-row-start": 4,
           }}
-        >
-          <div id="map">
-            {totalTiles.map(() => {
-              const tileClassNumber = 'tile tile' + Math.floor(Math.random()*7+1);
-              return <div class={tileClassNumber}></div>;
-            })}
-          </div>
-          <div id="players">
-            {players().map(p => {
-              return (
-                <div
-                  class="player body"
-                  style={{
-                    '--player-row': playerPositions().get(p.playerId)?.posY,
-                    '--player-col': playerPositions().get(p.playerId)?.posX,
-                  }}
-                >
-                  <div class="player-label">{p.nickname}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div id="overlays" hidden={!isMyTurn()}>
+        ></div> */}
+        {overlays.map((o: { x: number; y: number }) => (
+          <div
+            hidden={!isMyTurn()}
+            class={styles.overlay} // Corrected class to className
+            onClick={() =>
+              handleMovePlayer(
+                playerPositions().get(playerId()).posX + o.x,
+                playerPositions().get(playerId()).posY + o.y
+              )
+            }
+            style={{
+              "grid-column-start": playerPositions().get(playerId()).posX + o.x,
+              "grid-row-start": playerPositions().get(playerId()).posY + o.y,
+            }}
+          ></div>
+        ))}
+
+        {players().map((p) => {
+          return (
             <div
-              id="overlay-left"
-              class="overlay"
+              class={styles.player}
               style={{
-                'grid-column-start':
-                  playerPositions().get(playerId)?.posX! - 1,
-                'grid-row-start': playerPositions().get(playerId)?.posY!,
+                "--player-row": playerPositions().get(p.playerId)?.posY,
+                "--player-col": playerPositions().get(p.playerId)?.posX,
               }}
-            ></div>
-            <div
-              id="overlay-right"
-              class="overlay"
-              style={{
-                'grid-column-start':
-                  playerPositions().get(playerId)?.posX! + 1,
-                'grid-row-start': playerPositions().get(playerId)?.posY!,
-              }}
-            ></div>
-            <div
-              id="overlay-top"
-              class="overlay"
-              style={{
-                'grid-column-start': playerPositions().get(playerId)?.posX!,
-                'grid-row-start': playerPositions().get(playerId)?.posY! - 1,
-              }}
-            ></div>
-            <div
-              id="overlay-bottom"
-              class="overlay"
-              style={{
-                'grid-column-start': playerPositions().get(playerId)?.posX!,
-                'grid-row-start': playerPositions().get(playerId)?.posY! + 1,
-              }}
-            ></div>
-          </div>
-          <div id="actions">
-            {totalTiles.map((_, index) => {
-              const row = Math.floor(index / boardProperties().rows) + 1;
-              const col = (index % boardProperties().rows) + 1;
-              return (
-                <div
-                  class="action"
-                  onclick={() => {
-                    //movePlayer(row, col);
-                  }}
-                  data-action-id={`${row}-${col}`}
-                ></div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+            >
+              <span class="player-label">{p.nickname}</span>
+            </div>
+          );
+        })}
+      </div>
+      {isMyTurn() ? <button  type="button" onClick={handleFinishTurn}>Finish Turn</button> : <div></div>}
+    </section>
   );
 };

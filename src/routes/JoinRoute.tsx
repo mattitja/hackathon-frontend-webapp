@@ -11,7 +11,6 @@ export const JoinRoute = () => {
       playerId: playerId(),
       gameId: gameId().length == 4 ? gameId() : null,
     };
-    console.log(joinAction)
     ws.send(JSON.stringify(joinAction));
   };
 

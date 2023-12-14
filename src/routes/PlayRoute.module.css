@@ -1,0 +1,53 @@
+.container {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  min-height: 100vh;
+  padding: 1em;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--board-cols), 1fr);
+  grid-template-rows: repeat(var(--board-rows), 1fr);
+  /* width: calc(var(--board-cols) * 10vw);
+  height: calc(var(--board-rows) * 10vw); */
+  inline-size: max(300px, 90vmin);
+  block-size: max(300px, 90vmin);
+  border: 12px solid #73752d;
+  border-radius: 12px;
+  background-image: url(src/components/App/background.png);
+}
+
+.tile {
+  background: var(--tile-url);
+  background-size: cover;
+}
+
+.overlay {
+  background: url(src/components/App/sign.png);
+  opacity: 80%;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: opacity 0.5s ease;
+}
+
+.player {
+  display: grid;
+  grid: "player" 1fr / 1fr;
+  z-index: 2;
+  grid-column-start: var(--player-col);
+  grid-row-start: var(--player-row);
+  position: relative;
+
+  background-image: url(src/components/App/char1.png);
+  background-size: 80% 80%;
+  background-position: center;
+
+  & > span {
+    grid-area: player;
+    text-align: center;
+    font-size: 10px;
+    margin-block-start: 5%;
+  }
+}

@@ -8,7 +8,7 @@ export const PrepareRoute = () => {
   const handleInventoryDoneClick = () => {
     const action: InventoryUpdateActionDto = {
       actionType: "InventoryUpdateAction",
-      playerId: playerId,
+      playerId: playerId(),
       gameId: gameId(),
       weapons: [
         WeaponDto.Schere,

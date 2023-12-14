@@ -3,7 +3,7 @@ import { GameCreateActionDto } from "../generated/whackend";
 
 export const LobbyRoute = () => {
 
-  const { name, gameId, playerId, ws, players, setGameId } = useGame();
+  const { gameId, playerId, ws, players } = useGame();
 
   const handleCreateClick = () => {
     const action: GameCreateActionDto = {
