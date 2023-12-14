@@ -1,4 +1,4 @@
-# API model generation
+💯# API model generation
 npm install @openapitools/openapi-generator-cli -g
 
 ```

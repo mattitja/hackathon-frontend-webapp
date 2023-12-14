@@ -21,7 +21,7 @@ const GameContext = createContext();
 
 export const GameProvider = (props) => {
   const navigate = useNavigate();
-  const ws = createWS("ws://localhost:80/actions");
+  const ws = createWS("ws://hackathon-balancer-1963138121.eu-central-1.elb.amazonaws.com/actions");
   const state = createWSState(ws);
   const states = ["Connecting", "Connected", "Disconnecting", "Disconnected"];
   const [messages, setMessages] = createSignal<any[]>([]);
