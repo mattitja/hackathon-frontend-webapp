@@ -11,7 +11,6 @@ export const JoinRoute = () => {
     const form = new FormData(formEl);
     const nickname = form.get('nickname') as string;
     const gameId = form.get('gameId') as string || null;
-    console.log({ nickname, gameId });
     
     const joinAction: JoinActionDto = {
       actionType: "JoinAction",
