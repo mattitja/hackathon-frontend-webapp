@@ -1,0 +1,20 @@
+.main {
+  display: grid;
+  grid:
+    "outlet" 100dvh
+    "sidebar" auto
+    / 1fr;
+  min-block-size: 100dvh;
+
+  @media (--lg-n-above) {
+    grid: "outlet sidebar" 1fr / 1fr auto;
+  }
+}
+
+.outlet {
+  grid-area: outlet;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
