@@ -1,0 +1,15 @@
+.container {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+}
+
+.form {
+  display: grid;
+  gap: var(--size-fluid-3);
+}
+
+.formField {
+  display: grid;
+  gap: var(--size-1);
+}
