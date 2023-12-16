@@ -3,12 +3,11 @@
 @import "open-props/buttons";
 
 @font-face {
-  font-family: 'Videotype Regular';
+  font-family: "Videotype Regular";
   font-style: normal;
   font-weight: normal;
-  src:
-    local('Videotype Regular'),
-    url('src/components/App/videotype.woff') format('woff');
+  src: local("Videotype Regular"),
+    url("src/components/App/videotype.woff") format("woff");
 }
 
 ::-webkit-scrollbar {

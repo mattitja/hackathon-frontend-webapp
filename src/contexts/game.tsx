@@ -1,4 +1,5 @@
 import { createWS, createWSState } from "@solid-primitives/websocket";
+import { useNavigate } from "@solidjs/router";
 import {
   createContext,
   createEffect,
@@ -7,33 +8,44 @@ import {
   useContext,
 } from "solid-js";
 import {
-  PlayerDto,
   CoordinateDto,
-  JoinEventDtoFromJSON,
+  FightEventDto,
+  FightEventDtoFromJSON,
   GameCreatedEventDtoFromJSON,
   GameStartEventDtoFromJSON,
+  InventoryUpdateEventDtoFromJSON,
+  JoinEventDtoFromJSON,
+  KillEventDtoFromJSON,
   MovementEventDtoFromJSON,
   NextTurnEventDtoFromJSON,
-  EventDto,
+  PlayerDto,
+  WeaponDto,
 } from "../generated/whackend";
-import { useNavigate } from "@solidjs/router";
 
 const GameContext = createContext();
 
-export const GameProvider = (props) => {
+export const GameProvider = (props: any) => {
   const navigate = useNavigate();
   const ws = createWS("ws://localhost:80/actions");
   const state = createWSState(ws);
   const [messages, setMessages] = createSignal<any[]>([]);
 
   const [players, setPlayers] = createSignal<PlayerDto[]>([]);
-  const [playerPositions, setPlayerPositions] = createSignal<Map<string, CoordinateDto>>(new Map());
+  const [playerPositions, setPlayerPositions] = createSignal<
+    Map<string, CoordinateDto>
+  >(new Map());
 
   const [name, setName] = createSignal("asdf");
   const [playerId, setPlayerId] = createSignal("x");
   const [gameId, setGameId] = createSignal("");
 
   const [playersTurn, setPlayersTurn] = createSignal("");
+
+  const [myInventory, setMyInventory] = createSignal<WeaponDto[]>([]);
+  const [fightData, setFightData] = createSignal<FightEventDto>();
+
+  const [actionsLeft, setActionsLeft] = createSignal<number>(0);
+  const [myTurn, setMyTurn] = createSignal<boolean>(false);
 
   const boardWidth = 5;
   const boardHeight = 5;
@@ -44,9 +56,9 @@ export const GameProvider = (props) => {
   });
 
   createEffect(() => {
-    console.log(playerId())
-    console.log(playerPositions())
-  })
+    console.log(playerId());
+    console.log(playerPositions());
+  });
 
   // WebSocket-Nachrichtenverarbeitung
   createEffect(() => {
@@ -79,27 +91,46 @@ export const GameProvider = (props) => {
         const gameStartedEvent = GameStartEventDtoFromJSON(
           JSON.parse(event.data)
         );
-        setInterval(() => navigate("/play"), 500); // hack
-        ;
+        navigate("/play");
       }
       if (JSON.parse(event.data).eventType == "MovementEvent") {
         const movementEvent = MovementEventDtoFromJSON(JSON.parse(event.data));
-        console.log("update")
         setPlayerPositions((prevMap) => {
-            console.log("update1")
           const newMap = new Map(prevMap);
-          console.log("update2")
           newMap.set(movementEvent.playerId, movementEvent.to);
           return newMap;
         });
+        setActionsLeft(actionsLeft() - 1);
+      }
+      if (JSON.parse(event.data).eventType == "InventoryUpdateEvent") {
+        const inventoryEvent = InventoryUpdateEventDtoFromJSON(
+          JSON.parse(event.data)
+        );
+        setMyInventory(inventoryEvent.weapons);
       }
       if (JSON.parse(event.data).eventType == "NextTurnEvent") {
         const movementEvent = NextTurnEventDtoFromJSON(JSON.parse(event.data));
         setPlayersTurn(movementEvent.nextPlayerId);
+        if (playersTurn() == playerId()) {
+          setMyTurn(true);
+          setActionsLeft(2);
+        } else {
+          setMyTurn(false);
+          setActionsLeft(0);
+        }
       }
-
-      // Zustandsaktualisierung erzwingen
-      state(Date.now());
+      if (JSON.parse(event.data).eventType == "KillEvent") {
+        const killEvent = KillEventDtoFromJSON(JSON.parse(event.data));
+        setPlayers(players().filter((v) => v.playerId != killEvent.playerId));
+      }
+      if (JSON.parse(event.data).eventType == "FightEvent") {
+        const fightEvent = FightEventDtoFromJSON(JSON.parse(event.data));
+        setFightData(fightEvent);
+        setInterval(() => {
+          setFightData(undefined);
+        }, 2000);
+        setActionsLeft(actionsLeft() - 1);
+      }
     };
     ws.addEventListener("message", onMessage);
 
@@ -109,7 +140,7 @@ export const GameProvider = (props) => {
     });
   });
 
-  const gameStore:GameStore = {
+  const gameStore = {
     ws,
     state,
     messages,
@@ -128,6 +159,13 @@ export const GameProvider = (props) => {
     setPlayerId,
     setPlayersTurn,
     setBoardProperties,
+    myInventory,
+    setFightData,
+    fightData,
+    actionsLeft,
+    setActionsLeft,
+    myTurn,
+    setMyTurn,
   };
 
   return (
@@ -137,30 +175,6 @@ export const GameProvider = (props) => {
   );
 };
 
-type GameStore = {
-    ws: WebSocket;
-    state: (value?: any) => any;
-    messages: () => EventDto[];
-    players: () => PlayerDto[];
-    playerPositions: () => Map<string, CoordinateDto>;
-    name: () => string;
-    playerId: () => string;
-    gameId: () => string;
-    playersTurn: () => string;
-    boardProperties: () => {
-      rows: number;
-      cols: number;
-    };
-    setMessages: (value: EventDto[]) => EventDto[];
-    setPlayers: (value: PlayerDto[]) => PlayerDto[];
-    setPlayerPositions: (value: Map<string, CoordinateDto>) => Map<string, CoordinateDto>;
-    setName: (value: string) => string;
-    setPlayerId: (value: string) => string;
-    setGameId: (value: string) => string;
-    setPlayersTurn: (value: string) => string;
-    setBoardProperties: (value: { rows: number; cols: number }) => any;
-  }
-
-export function useGame(): GameStore | undefined {
+export function useGame() {
   return useContext(GameContext);
 }

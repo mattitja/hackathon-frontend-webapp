@@ -7,7 +7,6 @@ import { PlayRoute } from "../../routes/PlayRoute";
 import { HomeRoute } from "../../routes/HomeRoute";
 
 const App: Component = () => {
-
   return (
     <Router>
       <Route path="/" component={HomeRoute}>

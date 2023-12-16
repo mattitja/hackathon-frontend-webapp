@@ -2,10 +2,7 @@ import { createSignal } from "solid-js";
 import { useGame } from "../contexts/game";
 
 export const Console = () => {
-  const {
-    messages,
-    state,
-  } = useGame();
+  const { messages, state } = useGame();
   const states = ["Connecting", "Connected", "Disconnecting", "Disconnected"];
   return (
     <section id="connection">

@@ -1,9 +1,10 @@
-import { createEffect } from "solid-js";
+import { Show } from "solid-js";
 import { useGame } from "../contexts/game";
 import {
-  CoordinateDto,
   FinishTurnActionDto,
   MovementActionDto,
+  PlayerDto,
+  WeaponDto,
 } from "../generated/whackend";
 import styles from "./PlayRoute.module.css";
 
@@ -16,14 +17,18 @@ export const PlayRoute = () => {
     playersTurn,
     boardProperties,
     playerPositions,
+    myInventory,
+    fightData,
+    myTurn,
+    actionsLeft,
   } = useGame();
 
   const totalTiles = new Array(
     boardProperties().rows * boardProperties().cols
   ).fill(0);
 
-  function isMyTurn() {
-    return playerId() === playersTurn();
+  function isFight() {
+    return fightData() != undefined;
   }
 
   const handleMovePlayer = (x, y) => {
@@ -78,31 +83,30 @@ export const PlayRoute = () => {
             return <div />;
           }
         })}
-        {/* <div
-          class={styles.overlay}
-          style={{
-            "grid-column-start": 2,
-            "grid-row-start": 4,
-          }}
-        ></div> */}
-        {overlays.map((o: { x: number; y: number }) => (
-          <div
-            hidden={!isMyTurn()}
-            class={styles.overlay} // Corrected class to className
-            onClick={() =>
-              handleMovePlayer(
-                playerPositions().get(playerId()).posX + o.x,
-                playerPositions().get(playerId()).posY + o.y
-              )
-            }
-            style={{
-              "grid-column-start": playerPositions().get(playerId()).posX + o.x,
-              "grid-row-start": playerPositions().get(playerId()).posY + o.y,
-            }}
-          ></div>
-        ))}
+        {overlays.map((o: { x: number; y: number }) => {
+          if (playerPositions().get(playerId()) != undefined) {
+            return (
+              <div
+                hidden={!myTurn() || !actionsLeft()}
+                class={styles.overlay}
+                onClick={() =>
+                  handleMovePlayer(
+                    playerPositions().get(playerId()).posX + o.x,
+                    playerPositions().get(playerId()).posY + o.y
+                  )
+                }
+                style={{
+                  "grid-column-start":
+                    playerPositions().get(playerId()).posX + o.x,
+                  "grid-row-start":
+                    playerPositions().get(playerId()).posY + o.y,
+                }}
+              ></div>
+            );
+          }
+        })}
 
-        {players().map((p) => {
+        {players().map((p: PlayerDto) => {
           return (
             <div
               class={styles.player}
@@ -115,8 +119,47 @@ export const PlayRoute = () => {
             </div>
           );
         })}
+        <Show when={isFight()}>
+          <div
+            class={styles.fightWeapon}
+            style={{
+              "--player-row": playerPositions().get(fightData().playerId1).posY,
+              "--player-col": playerPositions().get(fightData().playerId1).posX,
+              "--weapon-url": `url(src/components/weapons/${
+                fightData().playerWeapon1
+              }.png)`,
+            }}
+          ></div>
+          <div
+            class={styles.fightWeapon}
+            style={{
+              "--player-row": playerPositions().get(fightData().playerId2).posY,
+              "--player-col": playerPositions().get(fightData().playerId2).posX,
+              "--weapon-url": `url(src/components/weapons/${
+                fightData().playerWeapon2
+              }.png)`,
+            }}
+          ></div>
+        </Show>
       </div>
-      {isMyTurn() ? <button  type="button" onClick={handleFinishTurn}>Finish Turn</button> : <div></div>}
+      <Show when={myTurn()}>
+        <button type="button" onClick={handleFinishTurn}>
+          Finish Turn
+        </button>
+      </Show>
+      <div class={styles.inventory}>
+        {myInventory().map((w: WeaponDto, idx: number) => {
+          return (
+            <div
+              class={styles.inventoryItem}
+              style={{
+                "--inventory-slot": idx + 1,
+                "--weapon-url": `url(src/components/weapons/${w}.png)`,
+              }}
+            ></div>
+          );
+        })}
+      </div>
     </section>
   );
 };
