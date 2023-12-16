@@ -1,3 +1,4 @@
+import { Show, createSignal } from "solid-js";
 import { useGame } from "../contexts/game";
 import { JoinActionDto } from "../generated/whackend/models/JoinActionDto";
 import styles from "./JoinRoute.module.css";
@@ -5,20 +6,26 @@ import styles from "./JoinRoute.module.css";
 export const JoinRoute = () => {
   const { ws, playerId } = useGame();
 
+  const [gameId, setGameId] = createSignal<any>(null);
+
   const handleJoinClick = (e: SubmitEvent) => {
     e.preventDefault();
     var formEl = e.target as HTMLFormElement;
     const form = new FormData(formEl);
-    const nickname = form.get('nickname') as string;
-    const gameId = form.get('gameId') as string || null;
-    
+    const nickname = form.get("nickname") as string;
+
     const joinAction: JoinActionDto = {
       actionType: "JoinAction",
       nickname,
-      playerId,
-      gameId,
+      playerId: playerId(),
+      gameId: gameId(),
     };
     ws.send(JSON.stringify(joinAction));
+  };
+
+  const handleGameIdInput = (e: Event) => {
+    const inputElement = e.target as HTMLInputElement;
+    setGameId(inputElement.value);
   };
 
   return (
@@ -31,9 +38,19 @@ export const JoinRoute = () => {
         <label class={styles.formField}>
           <div>Game ID</div>
           <small>Has a length of 4 characters</small>
-          <input type="text" name="gameId" pattern="\w{4}" />
+          <input
+            type="text"
+            name="gameId"
+            pattern=".{4}"
+            onInput={handleGameIdInput}
+          />
         </label>
-        <button type="submit">Join</button>
+        <Show
+          when={gameId() != null && gameId().length > 0}
+          fallback={<button type="submit">Create new Lobby</button>}
+        >
+          <button type="submit">Join Lobby</button>
+        </Show>
       </form>
     </section>
   );

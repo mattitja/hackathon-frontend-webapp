@@ -44,8 +44,8 @@
   grid-template-rows: repeat(var(--board-rows), 1fr);
   /* width: calc(var(--board-cols) * 10vw);
   height: calc(var(--board-rows) * 10vw); */
-  inline-size: max(300px, 90vmin);
-  block-size: max(300px, 90vmin);
+  inline-size: max(300px, 80vmin);
+  block-size: max(300px, 80vmin);
   border: 12px solid #73752d;
   border-radius: 12px;
   background-image: url(src/components/App/background.png);

@@ -24,9 +24,12 @@ import {
 
 const GameContext = createContext();
 
-export const GameProvider = (props: any) => {
+export const GameProvider = (props) => {
   const navigate = useNavigate();
   const ws = createWS("ws://localhost:80/actions");
+  // const ws = createWS(
+  //   "ws://hackathon-balancer-1963138121.eu-central-1.elb.amazonaws.com/actions"
+  // );
   const state = createWSState(ws);
   const [messages, setMessages] = createSignal<any[]>([]);
 
@@ -53,11 +56,6 @@ export const GameProvider = (props: any) => {
   const [boardProperties, setBoardProperties] = createSignal({
     rows: boardHeight,
     cols: boardWidth,
-  });
-
-  createEffect(() => {
-    console.log(playerId());
-    console.log(playerPositions());
   });
 
   // WebSocket-Nachrichtenverarbeitung

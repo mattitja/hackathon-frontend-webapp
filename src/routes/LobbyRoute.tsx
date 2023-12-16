@@ -1,3 +1,4 @@
+import { Show } from "solid-js";
 import { useGame } from "../contexts/game";
 import { GameCreateActionDto } from "../generated/whackend";
 
@@ -26,7 +27,9 @@ export const LobbyRoute = () => {
             ))}
           </ul>
         </label>
-        <button onClick={handleCreateClick}>Create Game</button>
+        <Show when={players().length >= 2}>
+          <button onClick={handleCreateClick}>Create Game</button>
+        </Show>
       </div>
     </section>
   );
