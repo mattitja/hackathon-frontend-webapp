@@ -112,3 +112,16 @@ h1 {
   border-radius: var(--radius-2);
   padding: var(--size-3);
 }
+
+.empty {
+  inline-size: 100%;
+  block-size: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  display: none;
+
+  &:only-child {
+    display: block;
+  }
+}
