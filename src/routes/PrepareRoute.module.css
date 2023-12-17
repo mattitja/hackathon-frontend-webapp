@@ -3,5 +3,5 @@
   margin-inline: auto;
   margin-block-start: var(--size-fluid-7);
   display: grid;
-  block-size: 100%;
+  block-size: auto;
 }

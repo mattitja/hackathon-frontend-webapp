@@ -13,6 +13,8 @@
 
 .outlet {
   grid-area: outlet;
+  min-block-size: 0;
+  block-size: 100dvh;
 }
 
 .sidebar {

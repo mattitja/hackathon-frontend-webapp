@@ -19,4 +19,6 @@
 
 .outlet {
   inline-size: 100%;
+  min-block-size: 0;
+  block-size: 100%;
 }
