@@ -1,5 +1,6 @@
 import { useGame } from "../contexts/game";
 import { InventoryUpdateActionDto, WeaponDto } from "../generated/whackend";
+import styles from "./PrepareRoute.module.css";
 
 export const PrepareRoute = () => {
   const {
@@ -31,11 +32,12 @@ export const PrepareRoute = () => {
   };
 
   return (
-    <section id="create-inventory">
-      <div>
-        Inventory
-        <button onClick={handleInventoryDoneClick}>I am ready</button>
+    <section class={['stack', styles.container].join(' ')}>
+      <h1>Prepare yourself</h1>
+      <div class="card">
+        <span>Inventory</span>
       </div>
+      <button onClick={handleInventoryDoneClick}>I am ready</button>
     </section>
   );
 };
