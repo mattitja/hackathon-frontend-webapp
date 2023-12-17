@@ -72,7 +72,7 @@ export const GameProvider = (props) => {
         const joinEvent = JoinEventDtoFromJSON(JSON.parse(event.data));
         setPlayers(joinEvent.playerNicknames);
         setGameId(joinEvent.gameId);
-        navigate("/lobby");
+        navigate(`/${gameId()}/lobby`);
       }
       if (JSON.parse(event.data).eventType == "GameCreatedEvent") {
         const gameCreatedEvent = GameCreatedEventDtoFromJSON(
@@ -83,13 +83,13 @@ export const GameProvider = (props) => {
           rows: gameCreatedEvent.boardProperties?.width!,
           cols: gameCreatedEvent.boardProperties?.height!,
         });
-        navigate("/prepare");
+        navigate(`/${gameId()}/prepare`);
       }
       if (JSON.parse(event.data).eventType == "GameStartEvent") {
         const gameStartedEvent = GameStartEventDtoFromJSON(
           JSON.parse(event.data)
         );
-        navigate("/play");
+        navigate(`/${gameId()}/play`);
       }
       if (JSON.parse(event.data).eventType == "MovementEvent") {
         const movementEvent = MovementEventDtoFromJSON(JSON.parse(event.data));
