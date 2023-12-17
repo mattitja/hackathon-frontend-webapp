@@ -4,11 +4,18 @@ import { JoinActionDto } from "../generated/whackend/models/JoinActionDto";
 import styles from "./JoinRoute.module.css";
 
 export const JoinRoute = () => {
-  const { ws, playerId } = useGame();
+  const game = useGame();
+  const { ws, playerId } = game ?? {};
 
   const [gameId, setGameId] = createSignal<any>(null);
 
   const handleJoinClick = (e: SubmitEvent) => {
+    if (!playerId?.()) {
+      throw Error(`Expected \`playerId\` to be defined but found it to be \`${playerId?.()}\``);
+    }
+    if (!ws) {
+      throw Error(`Expected a valid websocket instance (\`ws\`) found it to be \`${ws}\``);
+    }
     e.preventDefault();
     var formEl = e.target as HTMLFormElement;
     const form = new FormData(formEl);

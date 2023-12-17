@@ -6,22 +6,27 @@ import { useParams } from "@solidjs/router";
 
 export const LobbyRoute = () => {
   const { gameId } = useParams();
-  const { playerId, ws, players } = useGame();
+  const game = useGame();
+
+  const { playerId, ws, players } = game ?? {};
 
   const handleCreateClick = () => {
+    if (!playerId?.()) {
+      throw Error(`Expected \`playerId\` to be defined but found it to be \`${playerId?.()}\``);
+    }
     const action: GameCreateActionDto = {
       actionType: "GameCreateAction",
-      playerId: playerId,
+      playerId: playerId?.(),
       gameId,
     };
-    ws.send(JSON.stringify(action));
+    game?.ws.send(JSON.stringify(action));
   };
 
   return (
     <section class={['stack', styles.container].join(' ')}>
       <h1>Players</h1>
       <ul class={['stack', styles.list].join(' ')}>
-        <For each={players()}>
+        <For each={players?.()}>
           {({ nickname }) => (
             <li class={[
                 'fade-up-and-in',
@@ -34,7 +39,7 @@ export const LobbyRoute = () => {
           )}
         </For>
       </ul>
-      <Show when={players().length >= 2}>
+      <Show when={(players?.() ||[]).length >= 2}>
         <button onClick={handleCreateClick}>Create Game</button>
       </Show>
     </section>

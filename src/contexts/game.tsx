@@ -1,6 +1,8 @@
 import { createWS, createWSState } from "@solid-primitives/websocket";
 import { useNavigate } from "@solidjs/router";
 import {
+  Component,
+  JSXElement,
   createContext,
   createEffect,
   createSignal,
@@ -22,14 +24,12 @@ import {
   WeaponDto,
 } from "../generated/whackend";
 
-const GameContext = createContext();
-
-export const GameProvider = (props) => {
+const useGameValues = () => {
   const navigate = useNavigate();
-  const ws = createWS("ws://localhost:80/actions");
-  // const ws = createWS(
-  //   "ws://hackathon-balancer-1963138121.eu-central-1.elb.amazonaws.com/actions"
-  // );
+  // const ws = createWS("ws://localhost:80/actions");
+  const ws = createWS(
+    "ws://hackathon-balancer-1963138121.eu-central-1.elb.amazonaws.com/actions"
+  );
   const state = createWSState(ws);
   const [messages, setMessages] = createSignal<any[]>([]);
 
@@ -166,8 +166,16 @@ export const GameProvider = (props) => {
     setMyTurn,
   };
 
+  return gameStore;
+}
+
+const GameContext = createContext<ReturnType<typeof useGameValues>>();
+
+export const GameProvider: Component<{ children: JSXElement }> = (props) => {
+  const value = useGameValues();  
+
   return (
-    <GameContext.Provider value={gameStore}>
+    <GameContext.Provider value={value}>
       {props.children}
     </GameContext.Provider>
   );

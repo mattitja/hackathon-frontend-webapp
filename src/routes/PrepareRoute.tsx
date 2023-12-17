@@ -3,18 +3,24 @@ import { InventoryUpdateActionDto, WeaponDto } from "../generated/whackend";
 import styles from "./PrepareRoute.module.css";
 
 export const PrepareRoute = () => {
+  const game = useGame();
   const {
     gameId,
     playerId,
     ws,
-    setName,
-    setGameId,
-    boardProperties,
-    isBoardVisible,
-    playerPositions,
-  } = useGame();
+  } = game ?? {};
 
   const handleInventoryDoneClick = () => {
+    if (!playerId?.()) {
+      throw Error(`Expected \`playerId\` to be defined but found it to be \`${playerId?.()}\``);
+    }
+    if (!gameId?.()) {
+      throw Error(`Expected \`gameId\` to be defined but found it to be \`${gameId?.()}\``);
+    }
+    if (!ws) {
+      throw Error(`Expected a valid websocket instance (\`ws\`) found it to be \`${ws}\``);
+    }
+
     var inventory = [
       WeaponDto.Schere,
       WeaponDto.Stein,
