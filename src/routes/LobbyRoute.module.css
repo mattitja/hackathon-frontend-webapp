@@ -1,0 +1,19 @@
+.container {
+  inline-size: min(var(--size-content-2), 100%);
+  margin-inline: auto;
+  margin-block-start: var(--size-fluid-7);
+  display: grid;
+  block-size: 100%;
+}
+
+.list {
+  --_gap: var(--size-2);
+
+  padding: 0;
+}
+
+.card {
+  inline-size: 100%;
+  list-style: none;
+  margin: 0;
+}
