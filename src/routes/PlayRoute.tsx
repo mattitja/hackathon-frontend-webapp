@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { useGame } from "../contexts/game";
 import {
   FinishTurnActionDto,
@@ -7,6 +7,15 @@ import {
   WeaponDto,
 } from "../generated/whackend";
 import styles from "./PlayRoute.module.css";
+import SchereImgUrl from "../components/weapons/schere.png";
+import SteinImgUrl from "../components/weapons/stein.png";
+import PapierImgUrl from "../components/weapons/papier.png";
+
+const weaponToImageMap: Record<WeaponDto, string> = {
+  SCHERE: SchereImgUrl,
+  STEIN: SteinImgUrl,
+  PAPIER: PapierImgUrl
+} as const;
 
 export const PlayRoute = () => {
   const {
@@ -59,7 +68,7 @@ export const PlayRoute = () => {
   ];
 
   return (
-    <section class={styles.container}>
+    <section class={['stack', styles.container].join(' ')}>
       <div
         class={styles.board}
         style={{
@@ -142,23 +151,27 @@ export const PlayRoute = () => {
           ></div>
         </Show>
       </div>
-      <Show when={myTurn()}>
-        <button type="button" onClick={handleFinishTurn}>
-          Finish Turn
+      <div class={['stack', styles.footer].join(' ')}>
+        <button type="button" class={styles.inventory}>
+          <For each={myInventory()}>
+            {(w: WeaponDto, idx) => {
+            return (
+              <div
+                class={styles.inventoryItem}
+                style={{ "--inventory-slot": idx() + 1 }}
+              >
+                <img src={weaponToImageMap[w]} alt={w} />
+              </div>
+            );
+          }}
+          </For>
+          <strong class="empty">There are no items in your inventory</strong>
         </button>
-      </Show>
-      <div class={styles.inventory}>
-        {myInventory().map((w: WeaponDto, idx: number) => {
-          return (
-            <div
-              class={styles.inventoryItem}
-              style={{
-                "--inventory-slot": idx + 1,
-                "--weapon-url": `url(src/components/weapons/${w}.png)`,
-              }}
-            ></div>
-          );
-        })}
+        <Show when={myTurn()}>
+          <button type="button" onClick={handleFinishTurn}>
+            Finish Turn
+          </button>
+        </Show>
       </div>
     </section>
   );
